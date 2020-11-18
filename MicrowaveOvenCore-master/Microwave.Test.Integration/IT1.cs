@@ -2,11 +2,14 @@ using NUnit.Framework;
 
 namespace Microwave.Test.Integration
 {
-    public class Tests
+    /* Cook Controller, Display, Timer, Powertube */
+    public class IT1
     {
         [SetUp]
         public void Setup()
         {
+
+
         }
 
         [Test]
