@@ -55,21 +55,12 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void Test1()
+        public void Ready_DoorOpen_LightOn()
         {
-            Assert.Pass();
-        }
-
-        [Test]
-        public void DoorClosed_DoorOpen_LightOn()
-        {
-            _door.Closed += Raise.EventWith(this, EventArgs.Empty);
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
-             str.Contains("Light is turned on")
-             ));
-            _light.Received(1).TurnOn();
+             str.Contains("Light is turned on")));
         }
 
         [Test]
@@ -79,45 +70,94 @@ namespace Microwave.Test.Integration
             _door.Closed += Raise.EventWith(this, EventArgs.Empty);
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
-             str.Contains("Light is turned off")
-            ));
+             str.Contains("Light is turned off")));
         }
+
+        [Test]
+        public void DoorOpen_PowerButtonPressed_LightOn()
+        {
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            
+            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            str.Contains("Light is turned on")));
+        }
+
+        [Test]
+        public void DoorOpen_SetTimeButtonPressed_LightOn()
+        {
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            str.Contains("Light is turned on")));
+        }
+
+        [Test]
+        public void SetTimePressed_StartCancelPressed_LightOn()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+           
+            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            str.Contains("Light is turned on")));
+        }
+
+        [Test]
+        public void Cooking_StartCancelPressed_LightOff()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            str.Contains("Light is turned off")));
+        }
+
+        [Test]
+        public void Cooking_CookingIsDone_LightOff()
+        {
+            //_powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //_timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //_startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _cooker.StartCooking(100, 1);
+            System.Threading.Thread.Sleep(2000);
+            //_startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            str.Contains("Light is turned off")));
+        }
+
+
+
+
+
 
         //Thomas' test // 
-        [Test]
-        public void OpenDoor_LightOn_LogEqualOn()
-        {
-            _uut.OnDoorOpened(this, EventArgs.Empty);
-            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("on")));
-        }
-
-        [Test]
-        public void CloseDoor_LightOff_LogEqualOff()
-        {
-            _uut.OnDoorOpened(this, EventArgs.Empty);
-            _uut.OnDoorClosed(this, EventArgs.Empty);
-            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("off")));
-        }
 
         [Test]
         public void PressButton_Power_LogEqual50()
         {
             _uut.OnPowerPressed(this, EventArgs.Empty);
-            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("50")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("50")));
         }
 
         [Test]
         public void PressButton_Time_LogEqual()
         {
             _uut.OnTimePressed(this, EventArgs.Empty);
-            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("1:00")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("1:00")));
         }
 
         [Test]
         public void PressButton_StartCancel_LogEqual()
         {
             _uut.OnStartCancelPressed(this, EventArgs.Empty);
-            _fakeOutput.Received(0).OutputLine(Arg.Is<string>(str => str.Contains(null)));
+            _output.Received(0).OutputLine(Arg.Is<string>(str => str.Contains(null)));
         }
 
     }
