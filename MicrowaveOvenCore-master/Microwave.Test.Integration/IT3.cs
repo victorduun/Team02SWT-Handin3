@@ -72,15 +72,6 @@ namespace Microwave.Test.Integration
         }
      
         [Test]
-        public void CookingIsStarted_DisplayShow_PowerTubeShow_100()
-        {
-            //Set power to 100 and set time to 1min
-            IT_SetupToCook(2,1);
-            _uut.OnStartCancelPressed(this,EventArgs.Empty);
-            _fakeOutput.Received(2).OutputLine(Arg.Is<string>(str => str.Contains("100")));
-        }
-
-        [Test]
         public void CookingIsStarted_DisplayShow_PowerTubeShow_100_ShowTime_1()
         {
             //Set power to 100 and set time to 1min
