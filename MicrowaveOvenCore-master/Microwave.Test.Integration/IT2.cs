@@ -165,32 +165,33 @@ namespace Microwave.Test.Integration
             _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("2:00")));
         }
 
-
-
-
-
-
-        //Thomas' test // 
-
         [Test]
-        public void PressButton_Power_LogEqual50()
+        public void SetPower_StartCancelPressed_DisplayOutputEmpty()
         {
-            _uut.OnPowerPressed(this, EventArgs.Empty);
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("50")));
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.DidNotReceive().OutputLine(default);
         }
 
         [Test]
-        public void PressButton_Time_LogEqual()
+        public void Cooking_StartCancelPressed_DisplayOutputEmpty()
         {
-            _uut.OnTimePressed(this, EventArgs.Empty);
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("1:00")));
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.DidNotReceive().OutputLine(default);
         }
 
         [Test]
-        public void PressButton_StartCancel_LogEqual()
+        public void DoorOpen_PowerPressed_DisplayOutputEmpty()
         {
-            _uut.OnStartCancelPressed(this, EventArgs.Empty);
-            _output.Received(0).OutputLine(Arg.Is<string>(str => str.Contains(null)));
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.DidNotReceive().OutputLine(default);
         }
 
     }
