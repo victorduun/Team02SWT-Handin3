@@ -120,16 +120,49 @@ namespace Microwave.Test.Integration
         [Test]
         public void Cooking_CookingIsDone_LightOff()
         {
-            //_powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-            //_timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-            //_startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-
-            _cooker.StartCooking(100, 1);
-            System.Threading.Thread.Sleep(2000);
-            //_startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _uut.CookingIsDone();
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
             str.Contains("Light is turned off")));
+        }
+
+        [Test]
+        public void Ready_PowerPressed_DisplayOutput50()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("50")));
+        }
+
+        [Test]
+        public void Ready_2PowerPressed_DisplayOutput100()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("100")));
+        }
+
+        [Test]
+        public void SetPower_TimePressed_DisplayOutput1()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("1:00")));
+        }
+
+        [Test]
+        public void SetPower_2TimePressed_DisplayOutput2()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("2:00")));
         }
 
 
