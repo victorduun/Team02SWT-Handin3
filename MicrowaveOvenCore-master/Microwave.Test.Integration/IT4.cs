@@ -49,6 +49,7 @@ namespace Microwave.Test.Integration
             _fakepowerButton.Pressed += Raise.EventWith<EventArgs>();
             _faketimeButton.Pressed += Raise.EventWith<EventArgs>();
             _startCancelButton.Press();
+            _fakeTimer.Received().Start(60);
         }
 
         [Test]
