@@ -12,12 +12,9 @@ using NUnit.Framework;
 
 namespace Microwave.Test.Integration
 {
-    /* User interface, Light, Display*/
     [TestFixture]
     public class IT2
     {
-        //private StringWriter str;
-
         private IButton _powerButton;
         private IButton _timeButton;
         private IButton _startCancelButton;
@@ -71,6 +68,9 @@ namespace Microwave.Test.Integration
 
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
 
+            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+             str.ToLower().Contains("Light is turned on")
+            ));
             //Assert.That(str.ToString().Contains("Light is turned on"));
         }
 
