@@ -72,28 +72,57 @@ namespace Microwave.Test.Integration
         }
      
         [Test]
-        public void CookingIsStarted_DisplayShow_PowerTubeShow_100_ShowTime_1()
+        public void CookingIsStarted_DisplayShow_100W_ShowTime_1()
         {
             //Set power to 100 and set time to 1min
-            IT_SetupToCook(1, 1);
+            IT_SetupToCook(2, 1);
             _uut.OnStartCancelPressed(this, EventArgs.Empty);
-            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str => str.Contains("1")));
+            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("light is turned on") ||
+                str.ToLower().Contains("display shows: 100 W") ||
+                str.ToLower().Contains("display shows: 01:00")));
         }
-
+        
         [Test]
-        public void CookingIsStarted_DisplayShow_PowerTubeShow_100_ShowTime1()
+        public void CookingIsStarted_DisplayShow_PowerTube_Off_Display_Cleared_Light()
         {
-                        //Set power to 100 and set time to 1min
+           //Set power to 100 and set time to 1min
             IT_SetupToCook(2, 1);
             _uut.OnStartCancelPressed(this, EventArgs.Empty);
             _fakeOutput.ClearReceivedCalls();
             _faketimer.Expired += Raise.EventWith<EventArgs>();
-            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str =>
-                str.ToLower().Contains("powertube turned off") &&
-                str.ToLower().Contains("display cleared") &&
-                str.ToLower().Contains("light is turned off")
-            ));
+            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str => 
+                str.ToLower().Contains("powertube turned off") ||
+                str.ToLower().Contains("display cleared") ||
+                str.ToLower().Contains("light is turned off")));
         }
 
+        [Test]
+        public void CookingIsStarted_OnDoorOpen_Display_Cleared_Powertube_Off()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _uut.OnStartCancelPressed(this, EventArgs.Empty);
+            _fakeOutput.ClearReceivedCalls();
+            _uut.OnDoorOpened(this,EventArgs.Empty);
+            _fakeOutput.Received(2).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("display cleared") ||
+                str.ToLower().Contains("powertube turned off")));
+        }
+
+        [Test]
+        public void CookingIsStarted_Stop_Display_Cleared_Powertube_Off()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _uut.OnStartCancelPressed(this, EventArgs.Empty);
+            _fakeOutput.ClearReceivedCalls();
+            _uut.OnStartCancelPressed(this, EventArgs.Empty);
+            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("display cleared") ||
+                str.ToLower().Contains("powertube turned off") ||
+                //MyLight.TurnOff() is never called
+                str.ToLower().Contains("light is turned off"))); 
+        }
     }
 }
