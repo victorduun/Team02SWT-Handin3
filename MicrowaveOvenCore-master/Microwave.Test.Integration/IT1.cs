@@ -77,6 +77,32 @@ namespace Microwave.Test.Integration
                 str.ToLower().Contains("powertube turned off")));
         }
 
+        [Test]
+        public void StartCooking_10SecondTimer_WritesToConsole10Times()
+        {
+            _uut.StartCooking(100, 10);
+            _fakeOutput.ClearReceivedCalls();
+            System.Threading.Thread.Sleep(15000);
 
+            _fakeOutput.Received(10).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("display shows: ")));
+        }
+
+
+        [TestCase(5, 30)]
+        [TestCase(3, 30)]
+        [TestCase(1, 30)]
+        [TestCase(0, 30)]
+        [TestCase(0, 4)]
+        public void StartCooking_DisplayCorrectTime_TimeIsCorrect(int minutes, int seconds)
+        {
+            _uut.StartCooking(100, 22);
+            
+            System.Threading.Thread.Sleep(1100);
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains($"display shows: {minutes:D2}:{seconds-1:D2}")));
+
+
+        }
     }
 }
