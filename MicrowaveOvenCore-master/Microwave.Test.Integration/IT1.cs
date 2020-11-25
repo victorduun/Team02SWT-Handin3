@@ -96,13 +96,13 @@ namespace Microwave.Test.Integration
         [TestCase(0, 4)]
         public void StartCooking_DisplayCorrectTime_TimeIsCorrect(int minutes, int seconds)
         {
-            _uut.StartCooking(100, 22);
+            int time = minutes * 60 + seconds;
+            _uut.StartCooking(100, time);
             
             System.Threading.Thread.Sleep(1100);
+            int secondsToCheck = seconds - 1;
             _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
-                str.ToLower().Contains($"display shows: {minutes:D2}:{seconds-1:D2}")));
-
-
+                str.ToLower().Contains($"display shows: {minutes:D2}:{secondsToCheck:D2}")));
         }
     }
 }
