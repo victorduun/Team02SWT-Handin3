@@ -57,8 +57,8 @@ namespace Microwave.Test.Integration
         /* Initiate Start cooking helper function*/
         public void IT_SetupToCook(int setPower, int setTime)
         {
-            _fakedoor.Open();
-            _fakedoor.Close();
+            _fakedoor.Opened += Raise.EventWith<EventArgs>();
+            _fakedoor.Closed += Raise.EventWith<EventArgs>();
 
             for (int i = 0; i < setPower; i++)
             {
