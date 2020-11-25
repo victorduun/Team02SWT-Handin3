@@ -6,6 +6,7 @@ using Microwave.Classes.Boundary;
 using Microwave.Classes.Controllers;
 using Microwave.Classes.Interfaces;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
@@ -56,57 +57,89 @@ namespace Microwave.Test.Integration
         /* Initiate Start cooking helper function*/
         public void IT_SetupToCook(int setPower, int setTime)
         {
-            _uut.OnDoorOpened(this,EventArgs.Empty);
-            _uut.OnDoorClosed(this, EventArgs.Empty);
+            _fakedoor.Open();
+            _fakedoor.Close();
 
             for (int i = 0; i < setPower; i++)
             {
-                _uut.OnPowerPressed(this, EventArgs.Empty);
+                _fakepowerButton.Pressed += Raise.EventWith<EventArgs>();
             }
 
             for (int i = 0; i < setTime; i++)
             {
-                _uut.OnTimePressed(this, EventArgs.Empty);
+                _faketimeButton.Pressed += Raise.EventWith<EventArgs>();
             }
 
         }
-     
+
+        //Timer is tested in IT1.
         [Test]
-        public void CookingIsStarted_DisplayShow_100W_ShowTime_1()
+        public void CookingIsStarted_DisplayShow_100W()
         {
             //Set power to 100 and set time to 1min
             IT_SetupToCook(2, 1);
-            _uut.OnStartCancelPressed(this, EventArgs.Empty);
-            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str =>
-                str.ToLower().Contains("light is turned on") ||
-                str.ToLower().Contains("display shows: 100 W") ||
-                str.ToLower().Contains("display shows: 01:00")));
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("powertube works with 100")));
         }
         
         [Test]
-        public void CookingIsStarted_DisplayShow_PowerTube_Off_Display_Cleared_Light()
+        public void CookingIsDone_DisplayShow_PowerTube_Off_Display_Cleared_Light()
         {
            //Set power to 100 and set time to 1min
             IT_SetupToCook(2, 1);
-            _uut.OnStartCancelPressed(this, EventArgs.Empty);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
             _fakeOutput.ClearReceivedCalls();
             _faketimer.Expired += Raise.EventWith<EventArgs>();
-            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str => 
-                str.ToLower().Contains("powertube turned off") ||
-                str.ToLower().Contains("display cleared") ||
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str => 
+                str.ToLower().Contains("powertube turned off")));
+        }
+
+        [Test]
+        public void CookingIsDone_DisplayShow_Display_Cleared()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.ClearReceivedCalls();
+            _faketimer.Expired += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("display cleared")));
+        }
+
+        [Test]
+        public void CookingIsDone_DisplayShow_Light_Off()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.ClearReceivedCalls();
+            _faketimer.Expired += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
                 str.ToLower().Contains("light is turned off")));
         }
 
         [Test]
-        public void CookingIsStarted_OnDoorOpen_Display_Cleared_Powertube_Off()
+        public void CookingIsStarted_OnDoorOpen_Display_Cleared()
         {
             //Set power to 100 and set time to 1min
             IT_SetupToCook(2, 1);
-            _uut.OnStartCancelPressed(this, EventArgs.Empty);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
             _fakeOutput.ClearReceivedCalls();
-            _uut.OnDoorOpened(this,EventArgs.Empty);
-            _fakeOutput.Received(2).OutputLine(Arg.Is<string>(str =>
-                str.ToLower().Contains("display cleared") ||
+            _fakedoor.Opened += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("display cleared")));
+        }
+
+        [Test]
+        public void CookingIsStarted_OnDoorOpen_Powertube_Off()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.ClearReceivedCalls();
+            _fakedoor.Opened += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
                 str.ToLower().Contains("powertube turned off")));
         }
 
@@ -115,14 +148,35 @@ namespace Microwave.Test.Integration
         {
             //Set power to 100 and set time to 1min
             IT_SetupToCook(2, 1);
-            _uut.OnStartCancelPressed(this, EventArgs.Empty);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
             _fakeOutput.ClearReceivedCalls();
-            _uut.OnStartCancelPressed(this, EventArgs.Empty);
-            _fakeOutput.Received(3).OutputLine(Arg.Is<string>(str =>
-                str.ToLower().Contains("display cleared") ||
-                str.ToLower().Contains("powertube turned off") ||
-                //MyLight.TurnOff() is never called
-                str.ToLower().Contains("light is turned off"))); 
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("display cleared"))); 
+        }
+
+        [Test]
+        public void CookingIsStarted_Stop_Powertube_Off()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.ClearReceivedCalls();
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("powertube turned off")));
+        }
+
+        [Test]
+        public void CookingIsStarted_Stop_Light_Off()
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(2, 1);
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.ClearReceivedCalls();
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("light is turned off")));
         }
     }
 }
