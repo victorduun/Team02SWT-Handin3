@@ -166,33 +166,60 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void SetPower_StartCancelPressed_DisplayOutputEmpty()
+        public void SetPower_StartCancelPressed_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
 
-            _output.DidNotReceive().OutputLine(default);
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
         }
 
         [Test]
-        public void Cooking_StartCancelPressed_DisplayOutputEmpty()
+        public void Cooking_StartCancelPressed_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
 
-            _output.DidNotReceive().OutputLine(default);
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+            
         }
 
         [Test]
-        public void DoorOpen_PowerPressed_DisplayOutputEmpty()
+        public void PowerPressed_DoorOpen_DisplayCleared()
         {
-            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-
-            _output.DidNotReceive().OutputLine(default);
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
         }
+
+        [Test]
+        public void TimePressed_DoorOpen_DisplayCleared()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+        }
+
+        [Test]
+        public void Cooking_DoorOpen_DisplayCleared()
+        {
+            _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+
+            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+        }
+
+
+
+
+
 
     }
 }
