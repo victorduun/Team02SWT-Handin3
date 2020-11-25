@@ -55,8 +55,9 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void Ready_DoorOpen_LightOn()
+        public void Ready_DoorOpen_DisplayDisplayLightOn()
         {
+            //State == Ready as default
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
@@ -64,9 +65,10 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void DoorOpen_DoorClosed_LightOff()
+        public void DoorOpen_DoorClosed_DisplayLightOff()
         {
-            _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            _door.Opened += Raise.EventWith(this, EventArgs.Empty); 
+            //Now in DoorOpen. Light is on
             _door.Closed += Raise.EventWith(this, EventArgs.Empty);
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
@@ -74,30 +76,36 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void DoorOpen_PowerButtonPressed_LightOn()
+        public void DoorOpen_PowerButtonPressed_LightAlreadyOn()
         {
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            //Now in DoorOpen. Light is on
+            _output.ClearReceivedCalls(); //Clear output calls 
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-            
-            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            //Light is already on and display shouldn't show "Light is turned on"
+            _output.DidNotReceive().OutputLine(Arg.Is<string>(str =>
             str.Contains("Light is turned on")));
         }
 
         [Test]
-        public void DoorOpen_SetTimeButtonPressed_LightOn()
+        public void DoorOpen_SetTimeButtonPressed_LightAlreadyOn()
         {
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
+            //Now in DoorOpen. Light is on
+            _output.ClearReceivedCalls(); //Clear output calls 
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-
-            _output.Received(1).OutputLine(Arg.Is<string>(str =>
+            //Light is already on and display shouldn't show "Light is turned on"
+            _output.DidNotReceive().OutputLine(Arg.Is<string>(str =>
             str.Contains("Light is turned on")));
         }
 
         [Test]
-        public void SetTimePressed_StartCancelPressed_LightOn()
+        public void SetTimePressed_StartCancelPressed_DisplayLightOn()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
            
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
@@ -105,12 +113,14 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void Cooking_StartCancelPressed_LightOff()
+        public void Cooking_StartCancelPressed_DisplayLightOff()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
-
+            //Now in Cooking
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
@@ -118,11 +128,14 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void Cooking_CookingIsDone_LightOff()
+        public void Cooking_CookingIsDone_DisplayLightOff()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in Cooking
             _uut.CookingIsDone();
 
             _output.Received(1).OutputLine(Arg.Is<string>(str =>
@@ -132,57 +145,72 @@ namespace Microwave.Test.Integration
         [Test]
         public void Ready_PowerPressed_DisplayOutput50()
         {
+            //State == Ready as default
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("50")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("50")));
         }
 
         [Test]
         public void Ready_2PowerPressed_DisplayOutput100()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("100")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("100")));
         }
 
         [Test]
-        public void SetPower_TimePressed_DisplayOutput1()
+        public void SetPower_TimePressed_DisplayOutput1Colon00()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("1:00")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("1:00")));
         }
 
         [Test]
-        public void SetPower_2TimePressed_DisplayOutput2()
+        public void SetPower_2TimePressed_DisplayOutput2Colon00()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
             
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("2:00")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("2:00")));
         }
 
         [Test]
         public void SetPower_StartCancelPressed_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
 
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("Display cleared")));
         }
 
         [Test]
         public void Cooking_StartCancelPressed_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in Cooking
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
 
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("Display cleared")));
             
         }
 
@@ -190,36 +218,39 @@ namespace Microwave.Test.Integration
         public void PowerPressed_DoorOpen_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
             
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("Display cleared")));
         }
 
         [Test]
         public void TimePressed_DoorOpen_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime 
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
 
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("Display cleared")));
         }
 
         [Test]
         public void Cooking_DoorOpen_DisplayCleared()
         {
             _powerButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetPower
             _timeButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in SetTime
             _startCancelButton.Pressed += Raise.EventWith(this, EventArgs.Empty);
+            //Now in Cooking
             _door.Opened += Raise.EventWith(this, EventArgs.Empty);
 
-            _output.Received(1).OutputLine(Arg.Is<string>(str => str.Contains("Display cleared")));
+            _output.Received(1).OutputLine(Arg.Is<string>(str => 
+            str.Contains("Display cleared")));
         }
-
-
-
-
-
-
     }
 }
