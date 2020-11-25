@@ -49,19 +49,32 @@ namespace Microwave.Test.Integration
         {
             _uut.StartCooking(100, 1);
             System.Threading.Thread.Sleep(2000);
-            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str=>
-                str.ToLower().Contains("powertube turned off")
+            _fakeOutput.Received(2).OutputLine(Arg.Is<string>(str=>
+                str.ToLower().Contains("powertube turned off") || 
+                str.ToLower().Contains("powertube works with")
                 ));
         }
 
         [Test]
-        public void StartCooking_StartAndStopCooking_CookingNotDone()
+        public void StartCooking_StartAndStopCooking_NoCallBackToUserInterface()
         {
             _uut.StartCooking(100, 1);
             _uut.Stop();
             System.Threading.Thread.Sleep(2000);
 
             _userInterface.Received(0).CookingIsDone();
+        }
+
+        [Test]
+        public void StartCooking_StartAndStopCooking_NoOutput()
+        {
+            _uut.StartCooking(100, 1);
+            _fakeOutput.ClearReceivedCalls();
+            _uut.Stop();
+            System.Threading.Thread.Sleep(2000);
+
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str => 
+                str.ToLower().Contains("powertube turned off")));
         }
 
 
