@@ -201,5 +201,36 @@ namespace Microwave.Test.Integration
             _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
                 str.ToLower().Contains("light is turned off")));
         }
+
+
+        [TestCase(1)]
+        [TestCase(5)]
+        [TestCase(20)]
+        [TestCase(30)]
+        [TestCase(50)]
+        public void CookingIsStarted_CookWithNPowerButtonPresses_StartsCooking(int nPresses)
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(nPresses, 1);
+            _fakeOutput.ClearReceivedCalls();
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("light is turned on")));
+        }
+
+        [TestCase(1)]
+        [TestCase(5)]
+        [TestCase(20)]
+        [TestCase(30)]
+        [TestCase(50)]
+        public void CookingIsStarted_CookWithNTimerButtonPresses_StartsCooking(int nPresses)
+        {
+            //Set power to 100 and set time to 1min
+            IT_SetupToCook(1, nPresses);
+            _fakeOutput.ClearReceivedCalls();
+            _fakestartCancelButton.Pressed += Raise.EventWith<EventArgs>();
+            _fakeOutput.Received(1).OutputLine(Arg.Is<string>(str =>
+                str.ToLower().Contains("light is turned on")));
+        }
     }
 }
