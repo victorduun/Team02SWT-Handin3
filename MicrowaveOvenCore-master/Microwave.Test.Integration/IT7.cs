@@ -52,7 +52,6 @@ namespace Microwave.Test.Integration
             _uut.Open();
 
             var text = textCapture.ToString();
-
             Assert.AreEqual("Light is turned on\r\n", text);
         }
 
@@ -67,8 +66,23 @@ namespace Microwave.Test.Integration
             _uut.Close();
 
             var text = textCapture.ToString();
-
             Assert.AreEqual("Light is turned off\r\n", text);
+        }
+
+        [Test]
+        public void Cooking_OpenDoor_ConsoleOutputIsPowerOffDisplayCleared()
+        {
+            _powerButton.Press();
+            _timeButton.Press();
+            _startCancelButton.Press();
+
+            StringWriter textCapture = new StringWriter();
+            Console.SetOut(textCapture);
+
+            _uut.Open();
+
+            var text = textCapture.ToString();
+            Assert.AreEqual("PowerTube turned off\r\nDisplay cleared\r\n", text);
         }
     }
 }
