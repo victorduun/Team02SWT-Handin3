@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -43,14 +44,31 @@ namespace Microwave.Test.Integration
         }
 
         [Test]
-        public void Ready_OpenDoor_()
+        public void Ready_OpenDoor_ConsoleOutputIsLightOn()
         {
-            _uut.Opened += Raise.EventWith<EventArgs>();
-            _userInterface.Received(1).OnDoorOpened(this, EventArgs.Empty);
- 
+            StringWriter textCapture = new StringWriter();
+            Console.SetOut(textCapture);
+
+            _uut.Open();
+
+            var text = textCapture.ToString();
+
+            Assert.AreEqual("Light is turned on\r\n", text);
         }
 
+        [Test]
+        public void OpenDoor_CloseDoor_ConsoleOutputIsLightOff()
+        {
+            _uut.Open();
 
+            StringWriter textCapture = new StringWriter();
+            Console.SetOut(textCapture);
 
+            _uut.Close();
+
+            var text = textCapture.ToString();
+
+            Assert.AreEqual("Light is turned off\r\n", text);
+        }
     }
 }
